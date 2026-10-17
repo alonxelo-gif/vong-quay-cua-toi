@@ -1,0 +1,227 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Vòng quay của tôi</title>
+<style>
+:root { color-scheme: light dark; --bg: light-dark(#f5f6ff,#101326); --panel: light-dark(#ffffff,#1b2038); --text: light-dark(#202342,#f5f6ff); --muted: light-dark(#666b8d,#a9afd0); --line: light-dark(#e2e5f5,#343a5c); --accent: light-dark(#5b4bdb,#a79cff); --accent2: light-dark(#ed5b8c,#ff8fb1); }
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--text); font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
+#app { min-height: 100vh; width: 100%; background: var(--bg); padding: 28px 18px 36px; }
+.shell { max-width: 1080px; margin: 0 auto; }
+header { display:flex; align-items:center; justify-content:space-between; gap:16px; margin-bottom:22px; }
+.brand { display:flex; align-items:center; gap:12px; }
+.logo { width:46px; height:46px; display:grid; place-items:center; border-radius:15px; background:linear-gradient(135deg,#6658e8,#f15f9a); color:white; font-size:25px; box-shadow:0 8px 24px #6658e83b; }
+h1 { margin:0; font-size:clamp(23px,4vw,34px); letter-spacing:-.04em; }
+.sub { margin:4px 0 0; color:var(--muted); font-size:14px; }
+.pill { border:1px solid var(--line); border-radius:999px; padding:8px 12px; color:var(--muted); font-size:12px; white-space:nowrap; }
+.layout { display:grid; grid-template-columns:minmax(0,1.1fr) minmax(300px,.9fr); gap:20px; align-items:start; }
+.panel { background:var(--panel); border:1px solid var(--line); border-radius:24px; padding:22px; box-shadow:0 12px 34px #20234a0b; }
+.wheel-panel { text-align:center; }
+.wheel-wrap { width:min(100%,440px); margin:8px auto 14px; position:relative; aspect-ratio:1; }
+canvas { width:100%; height:100%; display:block; }
+.pointer { position:absolute; top:-3px; left:50%; transform:translateX(-50%); width:0;height:0; border-left:16px solid transparent; border-right:16px solid transparent; border-top:32px solid var(--text); filter:drop-shadow(0 3px 2px #0002); z-index:2; }
+.spin { border:0; border-radius:15px; padding:15px 25px; width:min(100%,280px); font-size:16px; font-weight:800; color:white; background:linear-gradient(100deg,#6255df,#e95591); cursor:pointer; box-shadow:0 9px 22px #745de43b; transition:transform .15s,opacity .15s; }
+.spin:hover { transform:translateY(-1px); } .spin:disabled { opacity:.55; cursor:wait; }
+.status { min-height:24px; margin:14px 0 0; color:var(--muted); font-size:14px; }
+.result { margin-top:12px; padding:14px; background:light-dark(#f1efff,#292344); border-radius:15px; display:none; }
+.result.show { display:block; animation:pop .28s ease-out; }
+.result small { color:var(--muted); display:block; margin-bottom:5px; }
+.result strong { font-size:25px; color:var(--accent); }
+@keyframes pop { from { transform:scale(.96); opacity:.4; } to { transform:scale(1); opacity:1; } }
+.section-title { font-size:18px; font-weight:800; margin:0 0 6px; }
+.help { color:var(--muted); font-size:13px; line-height:1.5; margin:0 0 17px; }
+label { display:block; font-size:13px; font-weight:700; margin-bottom:7px; }
+textarea, select, input { width:100%; border:1px solid var(--line); border-radius:12px; background:var(--bg); color:var(--text); padding:11px 12px; font:inherit; outline:none; }
+textarea:focus,select:focus,input:focus { border-color:var(--accent); }
+textarea { min-height:150px; resize:vertical; line-height:1.6; }
+.field { margin-bottom:16px; }
+.row { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+.note { border:1px solid var(--line); border-radius:14px; padding:12px; display:flex; gap:10px; align-items:flex-start; margin:2px 0 15px; }
+.note input { width:18px; height:18px; margin-top:2px; accent-color:var(--accent); }
+.note label { margin:0; line-height:1.45; }
+.note small { display:block; color:var(--muted); font-weight:400; margin-top:4px; }
+.secondary { border:1px solid var(--line); background:transparent; color:var(--text); border-radius:12px; padding:10px 13px; font-weight:700; cursor:pointer; }
+.actions { display:flex; gap:10px; flex-wrap:wrap; }
+.history { margin-top:18px; }
+.history-head { display:flex; align-items:center; justify-content:space-between; margin-bottom:10px; }
+.history-list { display:flex; flex-direction:column; gap:7px; max-height:190px; overflow:auto; }
+.history-item { display:flex; align-items:center; justify-content:space-between; gap:10px; padding:10px 12px; border:1px solid var(--line); border-radius:12px; font-size:13px; }
+.history-item span:last-child { font-weight:800; }
+.empty { color:var(--muted); font-size:13px; padding:10px 0; }
+footer { text-align:center; color:var(--muted); font-size:12px; margin-top:20px; line-height:1.6; }
+@media(max-width:780px) { #app {padding:18px 12px 28px;} .layout {grid-template-columns:1fr;} .panel {padding:17px; border-radius:20px;} header {align-items:flex-start;} .pill {display:none;} .wheel-wrap {max-width:380px;} }
+</style>
+</head>
+<body>
+<div id="app">
+  <div class="shell">
+    <header>
+      <div class="brand"><div class="logo">✦</div><div><h1>Vòng quay của tôi</h1><p class="sub">Tạo danh sách · Quay thử · Xem lịch sử</p></div></div>
+      <div class="pill">✦ Công cụ cá nhân</div>
+    </header>
+    <main class="layout">
+      <section class="panel wheel-panel" aria-label="Vòng quay">
+        <div class="wheel-wrap"><div class="pointer"></div><canvas id="wheel" width="900" height="900" aria-label="Vòng quay các lựa chọn"></canvas></div>
+        <button class="spin" id="spinBtn">QUAY NGAY ↗</button>
+        <p class="status" id="status" aria-live="polite">Thêm ít nhất 2 lựa chọn rồi nhấn quay.</p>
+        <div class="result" id="result"><small id="resultLabel">Kết quả</small><strong id="resultValue">—</strong></div>
+      </section>
+      <section class="panel" aria-label="Cài đặt vòng quay">
+        <h2 class="section-title">Tùy chỉnh vòng quay</h2>
+        <p class="help">Nhập mỗi lựa chọn trên một dòng. Các thay đổi sẽ cập nhật ngay trên vòng quay.</p>
+        <div class="field"><label for="options">Danh sách ô quay</label><textarea id="options">Trà sữa
+Đi xem phim
+Ăn pizza
+Đi dạo
+Ở nhà
+Mua món nhỏ</textarea></div>
+        <div class="row">
+          <div class="field"><label for="targetTurn">Lượt quay đặc biệt</label><input id="targetTurn" type="number" min="1" max="999999" value="5"></div>
+          <div class="field"><label for="targetOption">Ô được chọn ở lượt đó</label><select id="targetOption"><option value="">Chọn một ô</option></select></div>
+        </div>
+        <div class="note"><input type="checkbox" id="enableTarget" checked><label for="enableTarget">Bật kết quả định trước<small>Lượt đã chọn sẽ dừng đúng ô được cấu hình. Các lượt khác vẫn ngẫu nhiên. Dùng cho vòng quay cá nhân hoặc bản demo minh bạch.</small></label></div>
+        <div class="note"><input type="checkbox" id="removeWinner"><label for="removeWinner">Xóa ô trúng sau mỗi lượt quay<small>Ô vừa trúng sẽ bị xóa khỏi danh sách và không thể xuất hiện ở lượt sau. Ô được cài đặt cho lượt đặc biệt sẽ được giữ lại đến lượt đó.</small></label></div>
+        <div class="actions"><button class="secondary" id="applyBtn">Cập nhật danh sách</button><button class="secondary" id="resetBtn">Đặt lại lượt quay</button></div>
+        <div class="history"><div class="history-head"><h3 class="section-title" style="font-size:16px;margin:0">Lịch sử quay</h3><button class="secondary" id="clearBtn" style="padding:7px 10px;font-size:12px">Xóa lịch sử</button></div><div class="history-list" id="history"><div class="empty">Chưa có lượt quay nào.</div></div></div>
+      </section>
+    </main>
+    <footer>Vòng quay chạy ngay trong trình duyệt này. Tải lại trang sẽ đặt lại số lượt và lịch sử.<br>Hãy thông báo rõ quy tắc kết quả định trước nếu vòng quay được dùng trong trò chơi với người khác.</footer>
+  </div>
+</div>
+<script>
+(() => {
+  const canvas = document.getElementById('wheel');
+  const ctx = canvas.getContext('2d');
+  const optionsEl = document.getElementById('options');
+  const targetTurnEl = document.getElementById('targetTurn');
+  const targetOptionEl = document.getElementById('targetOption');
+  const enableTargetEl = document.getElementById('enableTarget');
+  const removeWinnerEl = document.getElementById('removeWinner');
+  const spinBtn = document.getElementById('spinBtn');
+  const statusEl = document.getElementById('status');
+  const resultEl = document.getElementById('result');
+  const resultLabel = document.getElementById('resultLabel');
+  const resultValue = document.getElementById('resultValue');
+  const historyEl = document.getElementById('history');
+  const colors = ['#7164e8','#f16b9a','#f2b84b','#42b9a4','#4e9de6','#b67be4','#f08058','#5b78d4','#d75cbd','#70b85b'];
+  let options = [];
+  let rotation = 0;
+  let count = 0;
+  let busy = false;
+  let history = [];
+  const norm = (s) => s.trim();
+  function readOptions() { return optionsEl.value.split('\n').map(norm).filter(Boolean); }
+  function updateTargetOptions(preferred) {
+    const current = preferred || targetOptionEl.value;
+    targetOptionEl.innerHTML = '<option value="">Chọn một ô</option>';
+    options.forEach((name, i) => {
+      const opt = document.createElement('option'); opt.value = name; opt.textContent = name; targetOptionEl.appendChild(opt);
+    });
+    if (options.includes(current)) targetOptionEl.value = current;
+    else if (options.length) targetOptionEl.value = options[0];
+  }
+  function applyOptions() {
+    const oldTarget = targetOptionEl.value;
+    options = readOptions();
+    if (options.length < 2) { statusEl.textContent = 'Vui lòng nhập ít nhất 2 lựa chọn khác nhau.'; drawWheel(); return false; }
+    updateTargetOptions(oldTarget);
+    drawWheel(); spinBtn.disabled = false; statusEl.textContent = `Đã cập nhật ${options.length} ô quay.`; return true;
+  }
+  function drawWheel() {
+    const w = canvas.width, cx = w/2, cy = w/2, r = w/2 - 16;
+    ctx.clearRect(0,0,w,w);
+    if (!options.length) { ctx.fillStyle = '#888'; ctx.font = '30px sans-serif'; ctx.textAlign='center'; ctx.fillText('Thêm lựa chọn',cx,cy); return; }
+    const step = Math.PI*2/options.length;
+    options.forEach((name,i) => {
+      const start = rotation + i*step - Math.PI/2;
+      const end = start+step;
+      ctx.beginPath(); ctx.moveTo(cx,cy); ctx.arc(cx,cy,r,start,end); ctx.closePath(); ctx.fillStyle=colors[i%colors.length]; ctx.fill();
+      ctx.strokeStyle='rgba(255,255,255,.9)'; ctx.lineWidth=5; ctx.stroke();
+      ctx.save(); ctx.translate(cx,cy); ctx.rotate(start+step/2); ctx.textAlign='right'; ctx.textBaseline='middle';
+      const fontSize = Math.max(19, Math.min(31, 390/options.length));
+      ctx.font = `700 ${fontSize}px system-ui, sans-serif`; ctx.fillStyle='#fff';
+      let label = name; const maxChars = Math.max(8, Math.floor(23 * 8 / fontSize));
+      if (label.length > maxChars) label = label.slice(0,maxChars-1)+'…';
+      ctx.shadowColor='rgba(0,0,0,.2)'; ctx.shadowBlur=2; ctx.fillText(label,r-35,0); ctx.restore();
+    });
+    ctx.beginPath(); ctx.arc(cx,cy,70,0,Math.PI*2); ctx.fillStyle='#fff'; ctx.fill(); ctx.strokeStyle='#e8e7ff'; ctx.lineWidth=10; ctx.stroke();
+    ctx.fillStyle='#39305e'; ctx.font='800 25px system-ui'; ctx.textAlign='center'; ctx.textBaseline='middle'; ctx.fillText('QUAY',cx,cy);
+  }
+  function recordResult(result, forced) {
+    history.unshift({turn:count,result,forced});
+    historyEl.innerHTML='';
+    history.forEach(item => {
+      const row=document.createElement('div'); row.className='history-item';
+      const left=document.createElement('span'); left.textContent=`Lượt ${item.turn}${item.forced?' · đã cài đặt':''}`;
+      const right=document.createElement('span'); right.textContent=item.result;
+      row.append(left,right); historyEl.appendChild(row);
+    });
+    if (!history.length) historyEl.innerHTML='<div class="empty">Chưa có lượt quay nào.</div>';
+  }
+  function easeOut(t) { return 1-Math.pow(1-t,4); }
+  function spin() {
+    if (busy) return;
+    if (!applyOptions()) return;
+    count++;
+    const targetTurn = Math.max(1, parseInt(targetTurnEl.value,10)||5);
+    const desired = enableTargetEl.checked && count===targetTurn && options.includes(targetOptionEl.value) ? targetOptionEl.value : null;
+    let index;
+    if (desired) {
+      index = options.indexOf(desired);
+    } else {
+      let pool = options.map((name, i) => i);
+      if (removeWinnerEl.checked && enableTargetEl.checked && count < targetTurn && options.length > 1) {
+        const protectedIndex = options.indexOf(targetOptionEl.value);
+        if (protectedIndex >= 0) pool = pool.filter(i => i !== protectedIndex);
+      }
+      index = pool[Math.floor(Math.random()*pool.length)];
+    }
+    const step = Math.PI*2/options.length;
+    // The pointer is at -PI/2. Center the chosen segment under it.
+    const desiredMod = (-(index+0.5)*step + Math.PI*2) % (Math.PI*2);
+    const currentMod = ((rotation % (Math.PI*2)) + Math.PI*2) % (Math.PI*2);
+    let delta = (desiredMod-currentMod+Math.PI*2)%(Math.PI*2);
+    delta += (5 + Math.floor(Math.random()*3))*Math.PI*2;
+    const start = rotation, end = rotation+delta, duration=3600;
+    const started = performance.now(); busy=true; spinBtn.disabled=true; resultEl.classList.remove('show');
+    statusEl.textContent = `Đang quay lượt ${count}…`;
+    function frame(now) {
+      const t=Math.min(1,(now-started)/duration); rotation=start+(end-start)*easeOut(t); drawWheel();
+      if(t<1) requestAnimationFrame(frame);
+      else {
+        rotation=end%(Math.PI*2); drawWheel(); busy=false; spinBtn.disabled=false;
+        const result=options[index];
+        resultLabel.textContent=desired ? `Kết quả lượt ${count} · theo cài đặt` : `Kết quả lượt ${count}`;
+        resultValue.textContent=result; resultEl.classList.add('show');
+        statusEl.textContent=desired ? 'Đã đến lượt quay được cài đặt trước.' : 'Kết quả được chọn ngẫu nhiên.';
+        recordResult(result, Boolean(desired));
+        if (removeWinnerEl.checked) {
+          const resultIndex = options.indexOf(result);
+          if (resultIndex >= 0) options.splice(resultIndex, 1);
+          optionsEl.value = options.join('\n');
+          updateTargetOptions(targetOptionEl.value);
+          drawWheel();
+          statusEl.textContent = options.length >= 2
+            ? `Đã xóa ô “${result}” khỏi vòng quay. Còn ${options.length} ô.`
+            : options.length === 1
+              ? `Đã xóa ô “${result}”. Chỉ còn 1 ô; hãy thêm lựa chọn để quay tiếp.`
+              : `Đã xóa ô “${result}”. Không còn ô nào trong danh sách.`;
+          if (options.length < 2) spinBtn.disabled = true;
+        }
+      }
+    }
+    requestAnimationFrame(frame);
+  }
+  document.getElementById('applyBtn').addEventListener('click',applyOptions);
+  document.getElementById('resetBtn').addEventListener('click',()=>{count=0;history=[];historyEl.innerHTML='<div class="empty">Chưa có lượt quay nào.</div>';resultEl.classList.remove('show');statusEl.textContent='Đã đặt lại số lượt quay.';});
+  document.getElementById('clearBtn').addEventListener('click',()=>{history=[];historyEl.innerHTML='<div class="empty">Chưa có lượt quay nào.</div>';});
+  spinBtn.addEventListener('click',spin);
+  optionsEl.addEventListener('change',applyOptions);
+  optionsEl.addEventListener('input',()=>{ if(!busy){options=readOptions();updateTargetOptions();drawWheel();} });
+  updateTargetOptions(); options=readOptions(); drawWheel();
+})();
+</script>
+</body>
+</html>
