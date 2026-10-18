@@ -106,7 +106,6 @@ Nguyễn Thanh Vân
 Nguyễn Tường Vy</textarea></div>
         <div class="field"><label>Các kết quả định trước</label><div class="target-rules" id="targetRules"><div class="target-rule"><div><label>Lượt quay</label><input class="target-turn" type="number" min="1" max="999999" value="5" aria-label="Số lượt quay đặc biệt"></div><div><label>Ô được chọn</label><select class="target-option" aria-label="Ô được chọn ở lượt đặc biệt"><option value="">Chọn một ô</option></select></div><button type="button" class="secondary remove-target-rule" aria-label="Xóa thiết lập lượt quay">×</button></div></div><button type="button" class="secondary add-target-rule" id="addTargetRuleBtn">+ Thêm lượt đặc biệt</button></div>
         <div class="note"><input type="checkbox" id="enableTarget" checked><label for="enableTarget">Bật kết quả định trước<small>Lượt đã chọn sẽ dừng đúng ô được cấu hình. Các lượt khác vẫn ngẫu nhiên. Dùng cho vòng quay cá nhân hoặc bản demo minh bạch.</small></label></div>
-        <div class="note"><input type="checkbox" id="removeWinner"><label for="removeWinner">Xóa ô trúng sau mỗi lượt quay<small>Ô vừa trúng sẽ bị xóa khỏi danh sách và không thể xuất hiện ở lượt sau. Ô được cài đặt cho lượt đặc biệt sẽ được giữ lại đến lượt đó.</small></label></div>
         <div class="actions"><button class="secondary" id="applyBtn">Cập nhật danh sách</button><button class="secondary" id="resetBtn">Đặt lại lượt quay</button></div>
         <div class="history"><div class="history-head"><h3 class="section-title" style="font-size:16px;margin:0">Lịch sử quay</h3><button class="secondary" id="clearBtn" style="padding:7px 10px;font-size:12px">Xóa lịch sử</button></div><div class="history-list" id="history"><div class="empty">Chưa có lượt quay nào.</div></div></div>
       </section>
@@ -149,7 +148,6 @@ Bùi Bảo
 Giang</textarea></div>
           <div class="field"><label>Các kết quả định trước</label><div class="target-rules" id="targetRules2"><div class="target-rule"><div><label>Lượt quay</label><input class="target-turn" type="number" min="1" max="999999" value="5" aria-label="Số lượt quay đặc biệt"></div><div><label>Ô được chọn</label><select class="target-option" aria-label="Ô được chọn ở lượt đặc biệt"><option value="">Chọn một ô</option></select></div><button type="button" class="secondary remove-target-rule" aria-label="Xóa thiết lập lượt quay">×</button></div></div><button type="button" class="secondary add-target-rule" id="addTargetRuleBtn2">+ Thêm lượt đặc biệt</button></div>
           <div class="note"><input type="checkbox" id="enableTarget2" checked><label for="enableTarget2">Bật kết quả định trước<small>Lượt đã chọn sẽ dừng đúng ô được cấu hình. Các lượt khác vẫn ngẫu nhiên.</small></label></div>
-          <div class="note"><input type="checkbox" id="removeWinner2"><label for="removeWinner2">Xóa ô trúng sau mỗi lượt quay<small>Ô trúng bị xóa, trừ ô được cài đặt cho lượt đặc biệt phía sau.</small></label></div>
           <div class="actions"><button class="secondary" id="applyBtn2">Cập nhật danh sách</button><button class="secondary" id="resetBtn2">Đặt lại lượt quay</button></div>
           <div class="history"><div class="history-head"><h3 class="section-title" style="font-size:16px;margin:0">Lịch sử quay 2</h3><button class="secondary" id="clearBtn2" style="padding:7px 10px;font-size:12px">Xóa lịch sử</button></div><div class="history-list" id="history2"><div class="empty">Chưa có lượt quay nào.</div></div></div>
         </section>
@@ -177,7 +175,6 @@ function initializeWheel(suffix = '') {
   const targetRulesEl = get('targetRules');
   const addTargetRuleBtn = get('addTargetRuleBtn');
   const enableTargetEl = get('enableTarget');
-  const removeWinnerEl = get('removeWinner');
   const spinBtn = get('spinBtn');
   const statusEl = get('status');
   const resultEl = get('result');
@@ -294,11 +291,6 @@ function initializeWheel(suffix = '') {
       index = options.indexOf(desired);
     } else {
       let pool = options.map((name, i) => i);
-      if (removeWinnerEl.checked && enableTargetEl.checked && options.length > 1) {
-        const futureOptions = getSpecialRules().filter(rule => rule.turn > count).map(rule => rule.option);
-        pool = pool.filter(i => !futureOptions.includes(options[i]));
-        if (!pool.length) pool = options.map((name, i) => i);
-      }
       index = pool[Math.floor(Math.random()*pool.length)];
     }
     const step = Math.PI*2/options.length;
@@ -326,21 +318,6 @@ function initializeWheel(suffix = '') {
         if (typeof resultDialog.showModal === 'function') resultDialog.showModal();
         statusEl.textContent=desired ? 'Đã đến lượt quay được cài đặt trước.' : 'Kết quả được chọn ngẫu nhiên.';
         recordResult(result, Boolean(desired));
-        if (removeWinnerEl.checked) {
-          const resultIndex = options.indexOf(result);
-          const neededLater = enableTargetEl.checked && getSpecialRules().some(rule => rule.turn > count && rule.option === result);
-          if (resultIndex >= 0 && !neededLater) options.splice(resultIndex, 1);
-          optionsEl.value = options.join('\n');
-          updateTargetRuleOptions(); drawWheel();
-          statusEl.textContent = neededLater
-            ? `Ô “${result}” được giữ lại vì đã cài cho một lượt đặc biệt sau.`
-            : options.length >= 2
-              ? `Đã xóa ô “${result}” khỏi vòng quay. Còn ${options.length} ô.`
-              : options.length === 1
-                ? `Đã xóa ô “${result}”. Chỉ còn 1 ô; hãy thêm lựa chọn để quay tiếp.`
-                : `Đã xóa ô “${result}”. Không còn ô nào trong danh sách.`;
-          if (options.length < 2) spinBtn.disabled = true;
-        }
       }
     }
     requestAnimationFrame(frame);
