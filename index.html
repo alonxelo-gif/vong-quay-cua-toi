@@ -291,6 +291,11 @@ function initializeWheel(suffix = '') {
       index = options.indexOf(desired);
     } else {
       let pool = options.map((name, i) => i);
+      if (enableTargetEl.checked && options.length > 1) {
+        const futureOptions = getSpecialRules().filter(rule => rule.turn > count).map(rule => rule.option);
+        pool = pool.filter(i => !futureOptions.includes(options[i]));
+        if (!pool.length) pool = options.map((name, i) => i);
+      }
       index = pool[Math.floor(Math.random()*pool.length)];
     }
     const step = Math.PI*2/options.length;
@@ -318,6 +323,19 @@ function initializeWheel(suffix = '') {
         if (typeof resultDialog.showModal === 'function') resultDialog.showModal();
         statusEl.textContent=desired ? 'Đã đến lượt quay được cài đặt trước.' : 'Kết quả được chọn ngẫu nhiên.';
         recordResult(result, Boolean(desired));
+        const resultIndex = options.indexOf(result);
+        const neededLater = enableTargetEl.checked && getSpecialRules().some(rule => rule.turn > count && rule.option === result);
+        if (resultIndex >= 0 && !neededLater) options.splice(resultIndex, 1);
+        optionsEl.value = options.join('\n');
+        updateTargetRuleOptions(); drawWheel();
+        statusEl.textContent = neededLater
+          ? `Ô “${result}” được giữ lại vì đã cài cho một lượt đặc biệt sau.`
+          : options.length >= 2
+            ? `Đã xóa ô “${result}” khỏi vòng quay. Còn ${options.length} ô.`
+            : options.length === 1
+              ? `Đã xóa ô “${result}”. Chỉ còn 1 ô; hãy thêm lựa chọn để quay tiếp.`
+              : `Đã xóa ô “${result}”. Không còn ô nào trong danh sách.`;
+        if (options.length < 2) spinBtn.disabled = true;
       }
     }
     requestAnimationFrame(frame);
