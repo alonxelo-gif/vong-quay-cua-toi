@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Vòng quay của tôi</title>
+<title>Vòng quay của alonxelo</title>
 <style>
 :root { color-scheme: light dark; --bg: light-dark(#f5f6ff,#101326); --panel: light-dark(#ffffff,#1b2038); --text: light-dark(#202342,#f5f6ff); --muted: light-dark(#666b8d,#a9afd0); --line: light-dark(#e2e5f5,#343a5c); --accent: light-dark(#5b4bdb,#a79cff); --accent2: light-dark(#ed5b8c,#ff8fb1); }
 * { box-sizing: border-box; }
@@ -16,7 +16,7 @@ header { display:flex; align-items:center; justify-content:space-between; gap:16
 h1 { margin:0; font-size:clamp(23px,4vw,34px); letter-spacing:-.04em; }
 .sub { margin:4px 0 0; color:var(--muted); font-size:14px; }
 .pill { border:1px solid var(--line); border-radius:999px; padding:8px 12px; color:var(--muted); font-size:12px; white-space:nowrap; }
-.layout { display:grid; grid-template-columns:minmax(0,1fr); gap:20px; align-items:start; }; grid-template-columns:minmax(0,1.1fr) minmax(300px,.9fr); gap:20px; align-items:start; }
+.layout { display:grid; grid-template-columns:minmax(0,1fr); gap:20px; align-items:start; }
 .panel { background:var(--panel); border:1px solid var(--line); border-radius:24px; padding:22px; box-shadow:0 12px 34px #20234a0b; }
 .wheel-panel { text-align:center; }
 .wheel-wrap { width:min(100%,440px); margin:8px auto 14px; position:relative; aspect-ratio:1; }
@@ -30,6 +30,13 @@ canvas { width:100%; height:100%; display:block; }
 .result small { color:var(--muted); display:block; margin-bottom:5px; }
 .result strong { font-size:25px; color:var(--accent); }
 @keyframes pop { from { transform:scale(.96); opacity:.4; } to { transform:scale(1); opacity:1; } }
+.result-dialog { width:min(92vw,500px); border:1px solid var(--line); border-radius:22px; padding:0; background:var(--panel); color:var(--text); box-shadow:0 24px 80px #0006; }
+.result-dialog::backdrop { background:rgba(8,10,22,.68); backdrop-filter:blur(3px); }
+.result-dialog-head { padding:18px 22px; border-bottom:1px solid var(--line); font-weight:800; text-transform:uppercase; }
+.result-dialog-body { padding:28px 24px; text-align:center; }
+.result-dialog-mark { width:58px; height:58px; border:4px solid var(--accent); color:var(--accent); border-radius:50%; display:grid; place-items:center; font-size:32px; margin:0 auto 18px; }
+.result-dialog-value { font-size:clamp(30px,7vw,42px); color:var(--accent); overflow-wrap:anywhere; }
+.result-dialog-actions { border-top:1px solid var(--line); padding:14px 20px; display:flex; justify-content:center; }
 .section-title { font-size:18px; font-weight:800; margin:0 0 6px; }
 .help { color:var(--muted); font-size:13px; line-height:1.5; margin:0 0 17px; }
 label { display:block; font-size:13px; font-weight:700; margin-bottom:7px; }
@@ -38,6 +45,11 @@ textarea:focus,select:focus,input:focus { border-color:var(--accent); }
 textarea { min-height:150px; resize:vertical; line-height:1.6; }
 .field { margin-bottom:16px; }
 .row { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+.target-rules { display:flex; flex-direction:column; gap:10px; }
+.target-rule { display:grid; grid-template-columns:minmax(80px,.7fr) minmax(0,1.3fr) auto; gap:10px; align-items:end; border:1px solid var(--line); border-radius:14px; padding:12px; }
+.target-rule label { margin-bottom:6px; }
+.target-rule .remove-target-rule { padding:10px 12px; min-width:42px; }
+.add-target-rule { margin-top:10px; width:100%; }
 .note { border:1px solid var(--line); border-radius:14px; padding:12px; display:flex; gap:10px; align-items:flex-start; margin:2px 0 15px; }
 .note input { width:18px; height:18px; margin-top:2px; accent-color:var(--accent); }
 .note label { margin:0; line-height:1.45; }
@@ -58,7 +70,7 @@ footer { text-align:center; color:var(--muted); font-size:12px; margin-top:20px;
 <div id="app">
   <div class="shell">
     <header>
-      <div class="brand"><div class="logo">✦</div><div><h1>Vòng quay của tôi</h1><p class="sub">Tạo danh sách · Quay thử · Xem lịch sử</p></div></div>
+      <div class="brand"><div class="logo">✦</div><div><h1>Vòng quay của alonxelo</h1><p class="sub">Tạo danh sách · Quay thử · Xem lịch sử</p></div></div>
       <div class="pill">✦ Công cụ cá nhân</div>
     </header>
     <main class="layout">
@@ -77,16 +89,18 @@ footer { text-align:center; color:var(--muted); font-size:12px; margin-top:20px;
 Đi dạo
 Ở nhà
 Mua món nhỏ</textarea></div>
-        <div class="row">
-          <div class="field"><label for="targetTurn">Lượt quay đặc biệt</label><input id="targetTurn" type="number" min="1" max="999999" value="5"></div>
-          <div class="field"><label for="targetOption">Ô được chọn ở lượt đó</label><select id="targetOption"><option value="">Chọn một ô</option></select></div>
-        </div>
+        <div class="field"><label>Các kết quả định trước</label><div class="target-rules" id="targetRules"><div class="target-rule"><div><label>Lượt quay</label><input class="target-turn" type="number" min="1" max="999999" value="5" aria-label="Số lượt quay đặc biệt"></div><div><label>Ô được chọn</label><select class="target-option" aria-label="Ô được chọn ở lượt đặc biệt"><option value="">Chọn một ô</option></select></div><button type="button" class="secondary remove-target-rule" aria-label="Xóa thiết lập lượt quay">×</button></div></div><button type="button" class="secondary add-target-rule" id="addTargetRuleBtn">+ Thêm lượt đặc biệt</button></div>
         <div class="note"><input type="checkbox" id="enableTarget" checked><label for="enableTarget">Bật kết quả định trước<small>Lượt đã chọn sẽ dừng đúng ô được cấu hình. Các lượt khác vẫn ngẫu nhiên. Dùng cho vòng quay cá nhân hoặc bản demo minh bạch.</small></label></div>
         <div class="note"><input type="checkbox" id="removeWinner"><label for="removeWinner">Xóa ô trúng sau mỗi lượt quay<small>Ô vừa trúng sẽ bị xóa khỏi danh sách và không thể xuất hiện ở lượt sau. Ô được cài đặt cho lượt đặc biệt sẽ được giữ lại đến lượt đó.</small></label></div>
         <div class="actions"><button class="secondary" id="applyBtn">Cập nhật danh sách</button><button class="secondary" id="resetBtn">Đặt lại lượt quay</button></div>
         <div class="history"><div class="history-head"><h3 class="section-title" style="font-size:16px;margin:0">Lịch sử quay</h3><button class="secondary" id="clearBtn" style="padding:7px 10px;font-size:12px">Xóa lịch sử</button></div><div class="history-list" id="history"><div class="empty">Chưa có lượt quay nào.</div></div></div>
       </section>
     </main>
+    <dialog class="result-dialog" id="resultDialog" aria-labelledby="resultDialogTitle">
+      <div class="result-dialog-head" id="resultDialogTitle">Bạn đã quay vào ô</div>
+      <div class="result-dialog-body"><div class="result-dialog-mark" aria-hidden="true">✓</div><div class="result-dialog-value" id="resultDialogValue">—</div></div>
+      <div class="result-dialog-actions"><button type="button" class="secondary" id="closeResultDialog">Đóng lại</button></div>
+    </dialog>
     <footer>Vòng quay chạy ngay trong trình duyệt này. Tải lại trang sẽ đặt lại số lượt và lịch sử.<br>Hãy thông báo rõ quy tắc kết quả định trước nếu vòng quay được dùng trong trò chơi với người khác.</footer>
   </div>
 </div>
@@ -95,8 +109,8 @@ Mua món nhỏ</textarea></div>
   const canvas = document.getElementById('wheel');
   const ctx = canvas.getContext('2d');
   const optionsEl = document.getElementById('options');
-  const targetTurnEl = document.getElementById('targetTurn');
-  const targetOptionEl = document.getElementById('targetOption');
+  const targetRulesEl = document.getElementById('targetRules');
+  const addTargetRuleBtn = document.getElementById('addTargetRuleBtn');
   const enableTargetEl = document.getElementById('enableTarget');
   const removeWinnerEl = document.getElementById('removeWinner');
   const spinBtn = document.getElementById('spinBtn');
@@ -104,6 +118,8 @@ Mua món nhỏ</textarea></div>
   const resultEl = document.getElementById('result');
   const resultLabel = document.getElementById('resultLabel');
   const resultValue = document.getElementById('resultValue');
+  const resultDialog = document.getElementById('resultDialog');
+  const resultDialogValue = document.getElementById('resultDialogValue');
   const historyEl = document.getElementById('history');
   const colors = ['#7164e8','#f16b9a','#f2b84b','#42b9a4','#4e9de6','#b67be4','#f08058','#5b78d4','#d75cbd','#70b85b'];
   let options = [];
@@ -111,22 +127,62 @@ Mua món nhỏ</textarea></div>
   let count = 0;
   let busy = false;
   let history = [];
+  let audioContext = null;
   const norm = (s) => s.trim();
+  function prepareAudio() {
+    try {
+      const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+      if (AudioContextClass && !audioContext) audioContext = new AudioContextClass();
+      if (audioContext && audioContext.state === 'suspended') audioContext.resume();
+    } catch (_) { audioContext = null; }
+  }
+  function playTone(frequency, duration, volume, wave='sine', delay=0) {
+    if (!audioContext || audioContext.state !== 'running') return;
+    try {
+      const start = audioContext.currentTime + delay;
+      const oscillator = audioContext.createOscillator();
+      const gain = audioContext.createGain();
+      oscillator.type = wave; oscillator.frequency.setValueAtTime(frequency, start);
+      gain.gain.setValueAtTime(0.0001, start);
+      gain.gain.exponentialRampToValueAtTime(volume, start + 0.006);
+      gain.gain.exponentialRampToValueAtTime(0.0001, start + duration);
+      oscillator.connect(gain); gain.connect(audioContext.destination);
+      oscillator.start(start); oscillator.stop(start + duration + 0.01);
+    } catch (_) {}
+  }
+  function playWheelTick() { playTone(880, 0.035, 0.045, 'triangle'); }
+  function playResultSound() {
+    playTone(660, 0.13, 0.075, 'sine');
+    playTone(880, 0.18, 0.075, 'sine', 0.10);
+    playTone(1100, 0.24, 0.075, 'sine', 0.20);
+  }
   function readOptions() { return optionsEl.value.split('\n').map(norm).filter(Boolean); }
-  function updateTargetOptions(preferred) {
-    const current = preferred || targetOptionEl.value;
-    targetOptionEl.innerHTML = '<option value="">Chọn một ô</option>';
-    options.forEach((name, i) => {
-      const opt = document.createElement('option'); opt.value = name; opt.textContent = name; targetOptionEl.appendChild(opt);
+  function getSpecialRules() {
+    return Array.from(targetRulesEl.querySelectorAll('.target-rule')).map(row => ({
+      turn: Math.max(1, parseInt(row.querySelector('.target-turn').value,10) || 1),
+      option: row.querySelector('.target-option').value
+    })).filter(rule => rule.option);
+  }
+  function updateTargetRuleOptions() {
+    targetRulesEl.querySelectorAll('.target-option').forEach(select => {
+      const current = select.value;
+      select.innerHTML = '<option value="">Chọn một ô</option>';
+      options.forEach(name => {
+        const opt = document.createElement('option'); opt.value = name; opt.textContent = name; select.appendChild(opt);
+      });
+      if (options.includes(current)) select.value = current;
+      else if (options.length) select.value = options[0];
     });
-    if (options.includes(current)) targetOptionEl.value = current;
-    else if (options.length) targetOptionEl.value = options[0];
+  }
+  function addSpecialRule(turn) {
+    const row = document.createElement('div'); row.className = 'target-rule';
+    row.innerHTML = `<div><label>Lượt quay</label><input class="target-turn" type="number" min="1" max="999999" value="${turn}" aria-label="Số lượt quay đặc biệt"></div><div><label>Ô được chọn</label><select class="target-option" aria-label="Ô được chọn ở lượt đặc biệt"><option value="">Chọn một ô</option></select></div><button type="button" class="secondary remove-target-rule" aria-label="Xóa thiết lập lượt quay">×</button>`;
+    targetRulesEl.appendChild(row); updateTargetRuleOptions();
   }
   function applyOptions() {
-    const oldTarget = targetOptionEl.value;
     options = readOptions();
     if (options.length < 2) { statusEl.textContent = 'Vui lòng nhập ít nhất 2 lựa chọn khác nhau.'; drawWheel(); return false; }
-    updateTargetOptions(oldTarget);
+    updateTargetRuleOptions();
     drawWheel(); spinBtn.disabled = false; statusEl.textContent = `Đã cập nhật ${options.length} ô quay.`; return true;
   }
   function drawWheel() {
@@ -164,17 +220,19 @@ Mua món nhỏ</textarea></div>
   function spin() {
     if (busy) return;
     if (!applyOptions()) return;
+    prepareAudio();
     count++;
-    const targetTurn = Math.max(1, parseInt(targetTurnEl.value,10)||5);
-    const desired = enableTargetEl.checked && count===targetTurn && options.includes(targetOptionEl.value) ? targetOptionEl.value : null;
+    const specialRule = enableTargetEl.checked ? getSpecialRules().find(rule => rule.turn === count && options.includes(rule.option)) : null;
+    const desired = specialRule ? specialRule.option : null;
     let index;
     if (desired) {
       index = options.indexOf(desired);
     } else {
       let pool = options.map((name, i) => i);
-      if (removeWinnerEl.checked && enableTargetEl.checked && count < targetTurn && options.length > 1) {
-        const protectedIndex = options.indexOf(targetOptionEl.value);
-        if (protectedIndex >= 0) pool = pool.filter(i => i !== protectedIndex);
+      if (removeWinnerEl.checked && enableTargetEl.checked && options.length > 1) {
+        const futureOptions = getSpecialRules().filter(rule => rule.turn > count).map(rule => rule.option);
+        pool = pool.filter(i => !futureOptions.includes(options[i]));
+        if (!pool.length) pool = options.map((name, i) => i);
       }
       index = pool[Math.floor(Math.random()*pool.length)];
     }
@@ -185,29 +243,37 @@ Mua món nhỏ</textarea></div>
     let delta = (desiredMod-currentMod+Math.PI*2)%(Math.PI*2);
     delta += (5 + Math.floor(Math.random()*3))*Math.PI*2;
     const start = rotation, end = rotation+delta, duration=3600;
-    const started = performance.now(); busy=true; spinBtn.disabled=true; resultEl.classList.remove('show');
+    const started = performance.now(); let lastTickIndex = Math.floor((((-rotation)%(Math.PI*2)+Math.PI*2)%(Math.PI*2))/step); busy=true; spinBtn.disabled=true; resultEl.classList.remove('show');
     statusEl.textContent = `Đang quay lượt ${count}…`;
     function frame(now) {
-      const t=Math.min(1,(now-started)/duration); rotation=start+(end-start)*easeOut(t); drawWheel();
+      const t=Math.min(1,(now-started)/duration); rotation=start+(end-start)*easeOut(t);
+      const tickIndex = Math.floor((((-rotation)%(Math.PI*2)+Math.PI*2)%(Math.PI*2))/step);
+      if (tickIndex !== lastTickIndex) { playWheelTick(); lastTickIndex = tickIndex; }
+      drawWheel();
       if(t<1) requestAnimationFrame(frame);
       else {
         rotation=end%(Math.PI*2); drawWheel(); busy=false; spinBtn.disabled=false;
         const result=options[index];
         resultLabel.textContent=desired ? `Kết quả lượt ${count} · theo cài đặt` : `Kết quả lượt ${count}`;
         resultValue.textContent=result; resultEl.classList.add('show');
+        resultDialogValue.textContent=result;
+        playResultSound();
+        if (typeof resultDialog.showModal === 'function') resultDialog.showModal();
         statusEl.textContent=desired ? 'Đã đến lượt quay được cài đặt trước.' : 'Kết quả được chọn ngẫu nhiên.';
         recordResult(result, Boolean(desired));
         if (removeWinnerEl.checked) {
           const resultIndex = options.indexOf(result);
-          if (resultIndex >= 0) options.splice(resultIndex, 1);
+          const neededLater = enableTargetEl.checked && getSpecialRules().some(rule => rule.turn > count && rule.option === result);
+          if (resultIndex >= 0 && !neededLater) options.splice(resultIndex, 1);
           optionsEl.value = options.join('\n');
-          updateTargetOptions(targetOptionEl.value);
-          drawWheel();
-          statusEl.textContent = options.length >= 2
-            ? `Đã xóa ô “${result}” khỏi vòng quay. Còn ${options.length} ô.`
-            : options.length === 1
-              ? `Đã xóa ô “${result}”. Chỉ còn 1 ô; hãy thêm lựa chọn để quay tiếp.`
-              : `Đã xóa ô “${result}”. Không còn ô nào trong danh sách.`;
+          updateTargetRuleOptions(); drawWheel();
+          statusEl.textContent = neededLater
+            ? `Ô “${result}” được giữ lại vì đã cài cho một lượt đặc biệt sau.`
+            : options.length >= 2
+              ? `Đã xóa ô “${result}” khỏi vòng quay. Còn ${options.length} ô.`
+              : options.length === 1
+                ? `Đã xóa ô “${result}”. Chỉ còn 1 ô; hãy thêm lựa chọn để quay tiếp.`
+                : `Đã xóa ô “${result}”. Không còn ô nào trong danh sách.`;
           if (options.length < 2) spinBtn.disabled = true;
         }
       }
@@ -217,10 +283,23 @@ Mua món nhỏ</textarea></div>
   document.getElementById('applyBtn').addEventListener('click',applyOptions);
   document.getElementById('resetBtn').addEventListener('click',()=>{count=0;history=[];historyEl.innerHTML='<div class="empty">Chưa có lượt quay nào.</div>';resultEl.classList.remove('show');statusEl.textContent='Đã đặt lại số lượt quay.';});
   document.getElementById('clearBtn').addEventListener('click',()=>{history=[];historyEl.innerHTML='<div class="empty">Chưa có lượt quay nào.</div>';});
+  addTargetRuleBtn.addEventListener('click',()=>{
+    const turns = Array.from(targetRulesEl.querySelectorAll('.target-turn')).map(input => parseInt(input.value,10) || 0);
+    addSpecialRule(Math.max(0,...turns)+1);
+  });
+  targetRulesEl.addEventListener('click',event=>{
+    const removeBtn = event.target.closest('.remove-target-rule');
+    if (removeBtn) removeBtn.closest('.target-rule').remove();
+  });
+  targetRulesEl.addEventListener('change',event=>{
+    if (event.target.classList.contains('target-turn') || event.target.classList.contains('target-option')) statusEl.textContent='Đã cập nhật thiết lập kết quả đặc biệt.';
+  });
+  document.getElementById('closeResultDialog').addEventListener('click',()=>resultDialog.close());
+  resultDialog.addEventListener('click',(event)=>{if(event.target===resultDialog) resultDialog.close();});
   spinBtn.addEventListener('click',spin);
   optionsEl.addEventListener('change',applyOptions);
-  optionsEl.addEventListener('input',()=>{ if(!busy){options=readOptions();updateTargetOptions();drawWheel();} });
-  updateTargetOptions(); options=readOptions(); drawWheel();
+  optionsEl.addEventListener('input',()=>{ if(!busy){options=readOptions();updateTargetRuleOptions();drawWheel();} });
+  options=readOptions(); updateTargetRuleOptions(); drawWheel();
 })();
 </script>
 </body>
