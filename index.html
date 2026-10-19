@@ -47,8 +47,6 @@ textarea { min-height:150px; resize:vertical; line-height:1.6; }
 .field { margin-bottom:16px; }
 .row { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
 .target-rules { display:flex; flex-direction:column; gap:10px; }
-.field:has(> #targetRules), .field:has(> #targetRules2) { display:none !important; }
-.note:has(> #enableTarget), .note:has(> #enableTarget2) { display:none !important; }
 .target-rule { display:grid; grid-template-columns:minmax(80px,.7fr) minmax(0,1.3fr) auto; gap:10px; align-items:end; border:1px solid var(--line); border-radius:14px; padding:12px; }
 .target-rule label { margin-bottom:6px; }
 .target-rule .remove-target-rule { padding:10px 12px; min-width:42px; }
@@ -103,8 +101,6 @@ Phùng Thanh Thủy
 Phùng Thị Thùy Trang
 Trịnh Thuỳ Trang
 Nguyễn Tường Vy</textarea></div>
-        <div class="field"><label>Các kết quả định trước</label><div class="target-rules" id="targetRules"><div class="target-rule"><div><label>Lượt quay</label><input class="target-turn" type="number" min="1" max="999999" value="5" aria-label="Số lượt quay đặc biệt"></div><div><label>Ô được chọn</label><select class="target-option" aria-label="Ô được chọn ở lượt đặc biệt"><option value="">Chọn một ô</option></select></div><button type="button" class="secondary remove-target-rule" aria-label="Xóa thiết lập lượt quay">×</button><</div><div class="target-rule"><div><label>Lượt quay</label><input class="target-turn" type="number" min="1" max="999999" value="10" aria-label="Số lượt quay đặc biệt"></div><div><label>Ô được chọn</label><select class="target-option" data-default-option="Nguyễn Phương Dung" aria-label="Ô được chọn ở lượt đặc biệt"><option value="">Chọn một ô</option></select></div><button type="button" class="secondary remove-target-rule" aria-label="Xóa thiết lập lượt quay">×</button></div><div class="target-rule"><div><label>Lượt quay</label><input class="target-turn" type="number" min="1" max="999999" value="6" aria-label="Số lượt quay đặc biệt"></div><div><label>Ô được chọn</label><select class="target-option" data-default-option="Phùng Thanh Thủy" aria-label="Ô được chọn ở lượt đặc biệt"><option value="">Chọn một ô</option></select></div><button type="button" class="secondary remove-target-rule" aria-label="Xóa thiết lập lượt quay">×</button></div></div><button type="button" class="secondary add-target-rule" id="addTargetRuleBtn">+ Thêm lượt đặc biệt</button></div>
-        <div class="note"><input type="checkbox" id="enableTarget" checked><label for="enableTarget">Bật kết quả định trước<small>Lượt đã chọn sẽ dừng đúng ô được cấu hình. Các lượt khác vẫn ngẫu nhiên. Dùng cho vòng quay cá nhân hoặc bản demo minh bạch.</small></label></div>
         <div class="actions"><button class="secondary" id="applyBtn">Cập nhật danh sách</button><button class="secondary" id="resetBtn">Đặt lại lượt quay</button></div>
         <div class="history"><div class="history-head"><h3 class="section-title" style="font-size:16px;margin:0">Lịch sử quay</h3><button class="secondary" id="clearBtn" style="padding:7px 10px;font-size:12px">Xóa lịch sử</button></div><div class="history-list" id="history"><div class="empty">Chưa có lượt quay nào.</div></div></div>
       </section>
@@ -143,8 +139,6 @@ minh Đức
 Phạm Dũng
 Bùi Bảo
 Giang</textarea></div>
-          <div class="field"><label>Các kết quả định trước</label><div class="target-rules" id="targetRules2"><div class="target-rule"><div><label>Lượt quay</label><input class="target-turn" type="number" min="1" max="999999" value="5" aria-label="Số lượt quay đặc biệt"></div><div><label>Ô được chọn</label><select class="target-option" aria-label="Ô được chọn ở lượt đặc biệt"><option value="">Chọn một ô</option></select></div><button type="button" class="secondary remove-target-rule" aria-label="Xóa thiết lập lượt quay">×</button><</div><div class="target-rule"><div><label>Lượt quay</label><input class="target-turn" type="number" min="1" max="999999" value="10" aria-label="Số lượt quay đặc biệt"></div><div><label>Ô được chọn</label><select class="target-option" data-default-option="Bùi Bảo" aria-label="Ô được chọn ở lượt đặc biệt"><option value="">Chọn một ô</option></select></div><button type="button" class="secondary remove-target-rule" aria-label="Xóa thiết lập lượt quay">×</button></div><div class="target-rule"><div><label>Lượt quay</label><input class="target-turn" type="number" min="1" max="999999" value="6" aria-label="Số lượt quay đặc biệt"></div><div><label>Ô được chọn</label><select class="target-option" data-default-option="Phan Bảo" aria-label="Ô được chọn ở lượt đặc biệt"><option value="">Chọn một ô</option></select></div><button type="button" class="secondary remove-target-rule" aria-label="Xóa thiết lập lượt quay">×</button></div></div><button type="button" class="secondary add-target-rule" id="addTargetRuleBtn2">+ Thêm lượt đặc biệt</button></div>
-          <div class="note"><input type="checkbox" id="enableTarget2" checked><label for="enableTarget2">Bật kết quả định trước<small>Lượt đã chọn sẽ dừng đúng ô được cấu hình. Các lượt khác vẫn ngẫu nhiên.</small></label></div>
           <div class="actions"><button class="secondary" id="applyBtn2">Cập nhật danh sách</button><button class="secondary" id="resetBtn2">Đặt lại lượt quay</button></div>
           <div class="history"><div class="history-head"><h3 class="section-title" style="font-size:16px;margin:0">Lịch sử quay 2</h3><button class="secondary" id="clearBtn2" style="padding:7px 10px;font-size:12px">Xóa lịch sử</button></div><div class="history-list" id="history2"><div class="empty">Chưa có lượt quay nào.</div></div></div>
         </section>
@@ -160,7 +154,7 @@ Giang</textarea></div>
       <div class="result-dialog-body"><div class="result-dialog-mark" aria-hidden="true">✓</div><div class="result-dialog-value" id="resultDialogValue2">—</div></div>
       <div class="result-dialog-actions"><button type="button" class="secondary" id="closeResultDialog2">Đóng lại</button></div>
     </dialog>
-    <footer>Vòng quay chạy ngay trong trình duyệt này. Tải lại trang sẽ đặt lại số lượt và lịch sử.<br>Hãy thông báo rõ quy tắc kết quả định trước nếu vòng quay được dùng trong trò chơi với người khác.</footer>
+    <footer>Vòng quay chạy ngay trong trình duyệt này. Tải lại trang sẽ đặt lại số lượt và lịch sử.<br>Kết quả được chọn ngẫu nhiên; ô trúng sẽ tự động được xóa khỏi danh sách.</footer>
   </div>
 </div>
 <script>
@@ -169,9 +163,6 @@ function initializeWheel(suffix = '') {
   const canvas = get('wheel');
   const ctx = canvas.getContext('2d');
   const optionsEl = get('options');
-  const targetRulesEl = get('targetRules');
-  const addTargetRuleBtn = get('addTargetRuleBtn');
-  const enableTargetEl = get('enableTarget');
   const spinBtn = get('spinBtn');
   const statusEl = get('status');
   const resultEl = get('result');
@@ -216,33 +207,9 @@ function initializeWheel(suffix = '') {
     playTone(1100, 0.24, 0.075, 'sine', 0.20);
   }
   function readOptions() { return optionsEl.value.split('\n').map(norm).filter(Boolean); }
-  function getSpecialRules() {
-    return Array.from(targetRulesEl.querySelectorAll('.target-rule')).map(row => ({
-      turn: Math.max(1, parseInt(row.querySelector('.target-turn').value,10) || 1),
-      option: row.querySelector('.target-option').value
-    })).filter(rule => rule.option);
-  }
-  function updateTargetRuleOptions() {
-    targetRulesEl.querySelectorAll('.target-option').forEach(select => {
-      const current = select.value;
-      select.innerHTML = '<option value="">Chọn một ô</option>';
-      options.forEach(name => {
-        const opt = document.createElement('option'); opt.value = name; opt.textContent = name; select.appendChild(opt);
-      });
-      if (options.includes(current)) select.value = current;
-      else if (options.includes(select.dataset.defaultOption)) select.value = select.dataset.defaultOption;
-      else if (options.length) select.value = options[0];
-    });
-  }
-  function addSpecialRule(turn) {
-    const row = document.createElement('div'); row.className = 'target-rule';
-    row.innerHTML = `<div><label>Lượt quay</label><input class="target-turn" type="number" min="1" max="999999" value="${turn}" aria-label="Số lượt quay đặc biệt"></div><div><label>Ô được chọn</label><select class="target-option" aria-label="Ô được chọn ở lượt đặc biệt"><option value="">Chọn một ô</option></select></div><button type="button" class="secondary remove-target-rule" aria-label="Xóa thiết lập lượt quay">×</button>`;
-    targetRulesEl.appendChild(row); updateTargetRuleOptions();
-  }
   function applyOptions() {
     options = readOptions();
     if (options.length < 2) { statusEl.textContent = 'Vui lòng nhập ít nhất 2 lựa chọn khác nhau.'; drawWheel(); return false; }
-    updateTargetRuleOptions();
     drawWheel(); spinBtn.disabled = false; statusEl.textContent = `Đã cập nhật ${options.length} ô quay.`; return true;
   }
   function drawWheel() {
@@ -265,12 +232,12 @@ function initializeWheel(suffix = '') {
     ctx.beginPath(); ctx.arc(cx,cy,70,0,Math.PI*2); ctx.fillStyle='#fff'; ctx.fill(); ctx.strokeStyle='#e8e7ff'; ctx.lineWidth=10; ctx.stroke();
     ctx.fillStyle='#39305e'; ctx.font='800 25px system-ui'; ctx.textAlign='center'; ctx.textBaseline='middle'; ctx.fillText('QUAY',cx,cy);
   }
-  function recordResult(result, forced) {
-    history.unshift({turn:count,result,forced});
+  function recordResult(result) {
+    history.unshift({turn:count,result});
     historyEl.innerHTML='';
     history.forEach(item => {
       const row=document.createElement('div'); row.className='history-item';
-      const left=document.createElement('span'); left.textContent=`Lượt ${item.turn}${item.forced?' · đã cài đặt':''}`;
+      const left=document.createElement('span'); left.textContent=`Lượt ${item.turn}`;
       const right=document.createElement('span'); right.textContent=item.result;
       row.append(left,right); historyEl.appendChild(row);
     });
@@ -282,20 +249,7 @@ function initializeWheel(suffix = '') {
     if (!applyOptions()) return;
     prepareAudio();
     count++;
-    const specialRule = enableTargetEl.checked ? getSpecialRules().find(rule => rule.turn === count && options.includes(rule.option)) : null;
-    const desired = specialRule ? specialRule.option : null;
-    let index;
-    if (desired) {
-      index = options.indexOf(desired);
-    } else {
-      let pool = options.map((name, i) => i);
-      if (enableTargetEl.checked && options.length > 1) {
-        const futureOptions = getSpecialRules().filter(rule => rule.turn > count).map(rule => rule.option);
-        pool = pool.filter(i => !futureOptions.includes(options[i]));
-        if (!pool.length) pool = options.map((name, i) => i);
-      }
-      index = pool[Math.floor(Math.random()*pool.length)];
-    }
+    const index = Math.floor(Math.random()*options.length);
     const step = Math.PI*2/options.length;
     // The pointer is at -PI/2. Center the chosen segment under it.
     const desiredMod = (-(index+0.5)*step + Math.PI*2) % (Math.PI*2);
@@ -314,25 +268,22 @@ function initializeWheel(suffix = '') {
       else {
         rotation=end%(Math.PI*2); drawWheel(); busy=false; spinBtn.disabled=false;
         const result=options[index];
-        resultLabel.textContent=desired ? `Kết quả lượt ${count} · theo cài đặt` : `Kết quả lượt ${count}`;
+        resultLabel.textContent = `Kết quả lượt ${count}`;
         resultValue.textContent=result; resultEl.classList.add('show');
         resultDialogValue.textContent=result;
         playResultSound();
         if (typeof resultDialog.showModal === 'function') resultDialog.showModal();
-        statusEl.textContent=desired ? 'Đã đến lượt quay được cài đặt trước.' : 'Kết quả được chọn ngẫu nhiên.';
-        recordResult(result, Boolean(desired));
+        statusEl.textContent = 'Kết quả được chọn ngẫu nhiên.';
+        recordResult(result);
         const resultIndex = options.indexOf(result);
-        const neededLater = enableTargetEl.checked && getSpecialRules().some(rule => rule.turn > count && rule.option === result);
-        if (resultIndex >= 0 && !neededLater) options.splice(resultIndex, 1);
+        if (resultIndex >= 0) options.splice(resultIndex, 1);
         optionsEl.value = options.join('\n');
-        updateTargetRuleOptions(); drawWheel();
-        statusEl.textContent = neededLater
-          ? `Ô “${result}” được giữ lại vì đã cài cho một lượt đặc biệt sau.`
-          : options.length >= 2
-            ? `Đã xóa ô “${result}” khỏi vòng quay. Còn ${options.length} ô.`
-            : options.length === 1
-              ? `Đã xóa ô “${result}”. Chỉ còn 1 ô; hãy thêm lựa chọn để quay tiếp.`
-              : `Đã xóa ô “${result}”. Không còn ô nào trong danh sách.`;
+        drawWheel();
+        statusEl.textContent = options.length >= 2
+          ? `Đã xóa ô “${result}” khỏi vòng quay. Còn ${options.length} ô.`
+          : options.length === 1
+            ? `Đã xóa ô “${result}”. Chỉ còn 1 ô; hãy thêm lựa chọn để quay tiếp.`
+            : `Đã xóa ô “${result}”. Không còn ô nào trong danh sách.`;
         if (options.length < 2) spinBtn.disabled = true;
       }
     }
@@ -341,23 +292,12 @@ function initializeWheel(suffix = '') {
   get('applyBtn').addEventListener('click',applyOptions);
   get('resetBtn').addEventListener('click',()=>{count=0;history=[];historyEl.innerHTML='<div class="empty">Chưa có lượt quay nào.</div>';resultEl.classList.remove('show');statusEl.textContent='Đã đặt lại số lượt quay.';});
   get('clearBtn').addEventListener('click',()=>{history=[];historyEl.innerHTML='<div class="empty">Chưa có lượt quay nào.</div>';});
-  addTargetRuleBtn.addEventListener('click',()=>{
-    const turns = Array.from(targetRulesEl.querySelectorAll('.target-turn')).map(input => parseInt(input.value,10) || 0);
-    addSpecialRule(Math.max(0,...turns)+1);
-  });
-  targetRulesEl.addEventListener('click',event=>{
-    const removeBtn = event.target.closest('.remove-target-rule');
-    if (removeBtn) removeBtn.closest('.target-rule').remove();
-  });
-  targetRulesEl.addEventListener('change',event=>{
-    if (event.target.classList.contains('target-turn') || event.target.classList.contains('target-option')) statusEl.textContent='Đã cập nhật thiết lập kết quả đặc biệt.';
-  });
   get('closeResultDialog').addEventListener('click',()=>resultDialog.close());
   resultDialog.addEventListener('click',(event)=>{if(event.target===resultDialog) resultDialog.close();});
   spinBtn.addEventListener('click',spin);
   optionsEl.addEventListener('change',applyOptions);
-  optionsEl.addEventListener('input',()=>{ if(!busy){options=readOptions();updateTargetRuleOptions();drawWheel();} });
-  options=readOptions(); updateTargetRuleOptions(); drawWheel();
+  optionsEl.addEventListener('input',()=>{ if(!busy){options=readOptions();drawWheel();} });
+  options=readOptions(); drawWheel();
 }
 initializeWheel('');
 initializeWheel('2');
